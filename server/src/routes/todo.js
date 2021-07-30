@@ -9,24 +9,23 @@ const todos = Array(5)
     text: "world" + (i + 1),
   }));
 
-router.get("/todos", (req, res) => {
+router.get("/", (req, res) => {
   res.json(todos);
 });
 
-router.get("/todos/:id", (req, res) => {
+router.get("/:id", (req, res) => {
   const todo = todos.find((todo) => todo.id === +req.params.id);
-  console.log(todo);
   if (!todo) {
-    return res.json({ error: "Todo not found" });
+    return res.status(404).json({ error: "Todo not found" });
   }
   res.json(todo);
 });
 
-router.post("/todos", (req, res) => {
+router.post("/", (req, res) => {
   const { title, text } = req.body;
 
   if (title.trim() === "" || text.trim() === "") {
-    return res.json({ error: "Invalid data" });
+    return res.status(406).json({ error: "Invalid data" });
   }
 
   const todo = { title, text, id: Date.now() + Math.random() * 1000 };
@@ -34,27 +33,28 @@ router.post("/todos", (req, res) => {
   res.json(todo);
 });
 
-router.delete("/todos/:id", (req, res) => {
+router.delete("/:id", (req, res) => {
   const idx = todos.findIndex((e) => e.id === +req.params.id);
   if (idx === -1) {
-    return res.json({ error: "Bad" });
+    return res.status(404).json({ error: "Todo does not exist" });
   }
   const todo = todos[idx];
   todos.splice(idx, 1);
   res.json(todo);
 });
 
-router.put("/todos/:id", (req, res) => {
+router.put("/:id", (req, res) => {
   const { title, text } = req.body;
   if (title.trim() === "" || text.trim() === "") {
-    return res.json({ error: "Invalid data" });
+    return res.status(406).json({ error: "Invalid data" });
   }
+
   const idx = todos.findIndex((e) => e.id === +req.params.id);
   if (idx === -1) {
-    return res.json({ error: "Bad" });
+    return res.status(404).json({ error: "Todo does not exist" });
   }
-  const todo = todos[idx];
 
+  const todo = todos[idx];
   for (const [k, v] of Object.entries(req.body)) {
     todo[k] = v;
   }
